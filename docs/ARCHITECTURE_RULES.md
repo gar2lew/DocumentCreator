@@ -1,0 +1,6 @@
+- Never overwrite template_versions
+- Never bypass template locking
+- Firestore is source of truth
+- No direct mutation of shared state outside store
+- Only modify files directly related to this task
+- Do not touch unrelated modules.

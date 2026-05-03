@@ -1,0 +1,28 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isSameOrg(orgId) {
+      return isAuthenticated() && request.auth.token.orgId == orgId;
+    }
+
+    match /templates/{orgId}/{allPaths=**} {
+      allow read, write: if isSameOrg(orgId);
+    }
+
+    match /generated/{orgId}/{allPaths=**} {
+      allow read, write: if isSameOrg(orgId);
+    }
+
+    match /fonts/{orgId}/{allPaths=**} {
+      allow read, write: if isSameOrg(orgId);
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

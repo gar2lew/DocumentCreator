@@ -1,0 +1,56 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "templates",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "organisationId", "order": "ASCENDING" },
+        { "fieldPath": "updatedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "projects",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "organisationId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "template_versions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "templateId", "order": "ASCENDING" },
+        { "fieldPath": "version", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "template_versions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "organisationId", "order": "ASCENDING" },
+        { "fieldPath": "templateId", "order": "ASCENDING" },
+        { "fieldPath": "version", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "documents_generated",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "organisationId", "order": "ASCENDING" },
+        { "fieldPath": "generatedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "documents_generated",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "organisationId", "order": "ASCENDING" },
+        { "fieldPath": "templateId", "order": "ASCENDING" },
+        { "fieldPath": "projectId", "order": "ASCENDING" },
+        { "fieldPath": "generatedAt", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
