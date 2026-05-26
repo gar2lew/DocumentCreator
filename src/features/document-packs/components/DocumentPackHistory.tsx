@@ -57,7 +57,7 @@ export function DocumentPackHistory({ dealId }: Props) {
   }
 
   if (loading) {
-    return <p className="text-sm text-gray-400">Loading document packs...</p>;
+    return <p className="text-sm text-text-tertiary">Loading document packs...</p>;
   }
 
   if (error) {
@@ -66,9 +66,9 @@ export function DocumentPackHistory({ dealId }: Props) {
 
   if (packs.length === 0) {
     return (
-      <div className="text-center py-10 text-gray-500">
+      <div className="text-center py-10 text-text-tertiary">
         <Clock className="w-9 h-9 mx-auto mb-3 opacity-30" />
-        <p className="text-sm font-medium text-gray-400">No document packs generated yet</p>
+        <p className="text-sm font-medium text-text-tertiary">No document packs generated yet</p>
       </div>
     );
   }
@@ -76,14 +76,14 @@ export function DocumentPackHistory({ dealId }: Props) {
   return (
     <div className="space-y-3">
       {packs.map((pack) => (
-        <div key={pack.id} className="bg-gray-900 border border-gray-800 rounded-xl p-4">
+        <div key={pack.id} className="bg-bg-secondary border border-border rounded-xl p-4">
           <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 bg-gray-800 rounded-lg">
+            <div className="p-2 bg-bg-tertiary rounded-lg">
               <Archive className="w-4 h-4 text-indigo-400" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white">Document Pack</p>
-              <p className="text-xs text-gray-500">{pack.createdAt.toLocaleString()}</p>
+              <p className="text-sm font-medium text-text">Document Pack</p>
+              <p className="text-xs text-text-tertiary">{pack.createdAt.toLocaleString()}</p>
             </div>
             {pack.packUrl ? (
               <a
@@ -118,11 +118,11 @@ export function DocumentPackHistory({ dealId }: Props) {
 
           <div className="space-y-2">
             {pack.files.map((file) => (
-              <div key={`${pack.id}:${file.name}`} className="flex items-center gap-3 rounded-lg bg-gray-950 px-3 py-2">
+              <div key={`${pack.id}:${file.name}`} className="flex items-center gap-3 rounded-lg bg-bg px-3 py-2">
                 <FileText className="w-4 h-4 text-blue-400 shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-gray-200 truncate">{file.name}</p>
-                  <p className="text-xs text-gray-600">{formatFileType(file.type)}</p>
+                  <p className="text-sm text-text-secondary truncate">{file.name}</p>
+                  <p className="text-xs text-text-tertiary">{formatFileType(file.type)}</p>
                 </div>
                 <a
                   href={canView ? file.url : undefined}
@@ -132,7 +132,7 @@ export function DocumentPackHistory({ dealId }: Props) {
                   onClick={(event) => {
                     if (!canView) event.preventDefault();
                   }}
-                  className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors aria-disabled:pointer-events-none aria-disabled:opacity-50"
+                  className="p-2 text-text-tertiary hover:text-text hover:bg-bg-tertiary rounded-lg transition-colors aria-disabled:pointer-events-none aria-disabled:opacity-50"
                   title={canView ? `Download ${file.name}` : 'Viewer access required'}
                 >
                   <Download className="w-4 h-4" />

@@ -18,7 +18,7 @@ export function Dashboard() {
         <h1 className="text-2xl font-bold text-white">
           Welcome back{currentUser?.displayName ? `, ${currentUser.displayName.split(' ')[0]}` : ''}
         </h1>
-        <p className="text-gray-400 text-sm mt-1">Manage your templates and generate documents</p>
+        <p className="text-text-tertiary text-sm mt-1">Manage your templates and generate documents</p>
       </div>
 
       {/* Stats */}
@@ -43,29 +43,29 @@ export function Dashboard() {
       <div className="grid grid-cols-2 gap-3 mb-8">
         <button
           onClick={() => navigate('/templates')}
-          className="flex items-center gap-3 p-4 bg-gray-900 border border-gray-800 hover:border-indigo-700 rounded-xl transition-colors text-left group"
+          className="flex items-center gap-3 p-4 bg-bg-secondary border border-border hover:border-indigo-700 rounded-xl transition-colors text-left group"
         >
           <div className="p-2 bg-indigo-900/30 rounded-lg">
             <Plus className="w-4 h-4 text-indigo-400" />
           </div>
           <div>
-            <p className="text-sm font-medium text-white">New Template</p>
-            <p className="text-xs text-gray-500">Create a document template</p>
+            <p className="text-sm font-medium text-text">New Template</p>
+            <p className="text-xs text-text-tertiary">Create a document template</p>
           </div>
-          <ArrowRight className="w-4 h-4 text-gray-600 ml-auto group-hover:text-indigo-400 transition-colors" />
+          <ArrowRight className="w-4 h-4 text-text-tertiary ml-auto group-hover:text-indigo-400 transition-colors" />
         </button>
         <button
           onClick={() => navigate('/projects')}
-          className="flex items-center gap-3 p-4 bg-gray-900 border border-gray-800 hover:border-emerald-700 rounded-xl transition-colors text-left group"
+          className="flex items-center gap-3 p-4 bg-bg-secondary border border-border hover:border-emerald-700 rounded-xl transition-colors text-left group"
         >
           <div className="p-2 bg-emerald-900/30 rounded-lg">
             <Plus className="w-4 h-4 text-emerald-400" />
           </div>
           <div>
-            <p className="text-sm font-medium text-white">New Project</p>
-            <p className="text-xs text-gray-500">Add a client or project</p>
+            <p className="text-sm font-medium text-text">New Project</p>
+            <p className="text-xs text-text-tertiary">Add a client or project</p>
           </div>
-          <ArrowRight className="w-4 h-4 text-gray-600 ml-auto group-hover:text-emerald-400 transition-colors" />
+          <ArrowRight className="w-4 h-4 text-text-tertiary ml-auto group-hover:text-emerald-400 transition-colors" />
         </button>
       </div>
 
@@ -73,7 +73,7 @@ export function Dashboard() {
       {recentTemplates.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-gray-300">Recent Templates</h2>
+            <h2 className="text-sm font-semibold text-text-secondary">Recent Templates</h2>
             <button onClick={() => navigate('/templates')} className="text-xs text-indigo-400 hover:text-indigo-300">View all</button>
           </div>
           <div className="space-y-2">
@@ -81,14 +81,14 @@ export function Dashboard() {
               <button
                 key={t.id}
                 onClick={() => navigate(`/templates/${t.id}`)}
-                className="w-full flex items-center gap-3 px-4 py-3 bg-gray-900 border border-gray-800 hover:border-gray-700 rounded-xl text-left transition-colors"
+                className="w-full flex items-center gap-3 px-4 py-3 bg-bg-secondary border border-border hover:border-border-secondary rounded-xl text-left transition-colors"
               >
-                <FileText className="w-4 h-4 text-gray-500 shrink-0" />
+                <FileText className="w-4 h-4 text-text-tertiary shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-white truncate">{t.name}</p>
-                  <p className="text-xs text-gray-600">v{t.currentVersion} · {t.updatedAt.toLocaleDateString()}</p>
+                  <p className="text-sm text-text truncate">{t.name}</p>
+                  <p className="text-xs text-text-tertiary">v{t.currentVersion} · {t.updatedAt.toLocaleDateString()}</p>
                 </div>
-                <ArrowRight className="w-3.5 h-3.5 text-gray-600 shrink-0" />
+                <ArrowRight className="w-3.5 h-3.5 text-text-tertiary shrink-0" />
               </button>
             ))}
           </div>
@@ -106,11 +106,11 @@ function StatCard({ icon, label, value, bg, onClick }: {
   onClick: () => void;
 }) {
   return (
-    <button onClick={onClick} className="flex items-center gap-4 p-5 bg-gray-900 border border-gray-800 rounded-xl hover:border-gray-700 transition-colors text-left">
+    <button onClick={onClick} className="flex items-center gap-4 p-5 bg-bg-secondary border border-border rounded-xl hover:border-border-secondary transition-colors text-left">
       <div className={`p-3 ${bg} rounded-xl`}>{icon}</div>
       <div>
-        <p className="text-2xl font-bold text-white">{value}</p>
-        <p className="text-sm text-gray-400">{label}</p>
+        <p className="text-2xl font-bold text-text">{value}</p>
+        <p className="text-sm text-text-tertiary">{label}</p>
       </div>
     </button>
   );

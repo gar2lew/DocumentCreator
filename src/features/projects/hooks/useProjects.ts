@@ -35,12 +35,14 @@ function mergeServerProjects(current: Project[], serverProjects: Project[], pend
 
 export function useProjects() {
   const { currentUser, projects, setProjects, selectedProject, setSelectedProject } = useAppStore();
-  const organisationId = currentUser?.organisationId ?? '';
+  const organisationId = currentUser?.organisationId;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   // Real-time listener
   useEffect(() => {
+    console.log('ORG ID:', organisationId);
+
     if (!organisationId) {
       setProjects([]);
       setSelectedProject(null);
@@ -64,7 +66,9 @@ export function useProjects() {
           .filter((d) => !d.metadata.hasPendingWrites)
           .map((d) => mapProject(d.id, d.data()));
         const currentProjects = useAppStore.getState().projects;
-        setProjects(mergeServerProjects(currentProjects, serverProjects, pendingIds));
+        const mergedProjects = mergeServerProjects(currentProjects, serverProjects, pendingIds);
+        console.log('PROJECTS:', mergedProjects);
+        setProjects(mergedProjects);
         setLoading(false);
       },
       (err) => {
@@ -74,7 +78,7 @@ export function useProjects() {
       }
     );
     return unsub;
-  }, [organisationId, setProjects, setSelectedProject]);
+  }, [organisationId]);
 
   const create = useCallback(async (data: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>) => {
     if (!currentUser?.organisationId) {

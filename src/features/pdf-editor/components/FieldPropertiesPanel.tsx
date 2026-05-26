@@ -9,7 +9,7 @@ interface Props {
 export function FieldPropertiesPanel({ field, onUpdate, onRemove }: Props) {
   return (
     <div className="p-4 space-y-3">
-      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Field Properties</p>
+      <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider">Field Properties</p>
 
       <Row label="Name">
         <input className={cls} value={field.name} onChange={(e) => onUpdate({ name: e.target.value })} />
@@ -62,12 +62,12 @@ export function FieldPropertiesPanel({ field, onUpdate, onRemove }: Props) {
   );
 }
 
-const cls = 'w-full bg-gray-800 border border-gray-700 rounded-md px-2 py-1 text-xs text-white focus:outline-none focus:border-indigo-500';
+const cls = 'w-full bg-bg-input border border-border-secondary rounded-md px-2 py-1 text-xs text-text focus:outline-none focus:border-indigo-500';
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="block text-xs text-gray-500 mb-0.5">{label}</label>
+      <label className="block text-xs text-text-tertiary mb-0.5">{label}</label>
       {children}
     </div>
   );

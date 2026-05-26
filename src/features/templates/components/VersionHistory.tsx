@@ -34,27 +34,27 @@ export function VersionHistory({ templateId, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-lg shadow-2xl">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+      <div className="bg-bg-secondary border border-border rounded-2xl w-full max-w-lg shadow-2xl">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-2">
             <History className="w-5 h-5 text-indigo-400" />
-            <h2 className="text-lg font-semibold text-white">Version History</h2>
+            <h2 className="text-lg font-semibold text-text">Version History</h2>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-white"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="text-text-tertiary hover:text-text"><X className="w-5 h-5" /></button>
         </div>
 
         <div className="overflow-y-auto max-h-[60vh]">
           {loading ? (
-            <p className="p-6 text-gray-400 text-sm">Loading…</p>
+            <p className="p-6 text-text-tertiary text-sm">Loading…</p>
           ) : versions.length === 0 ? (
-            <p className="p-6 text-gray-400 text-sm">No versions found.</p>
+            <p className="p-6 text-text-tertiary text-sm">No versions found.</p>
           ) : (
-            <div className="divide-y divide-gray-800">
+            <div className="divide-y divide-border">
               {versions.map((v, i) => (
                 <div key={v.id} className="px-6 py-4 flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className={`text-sm font-bold ${i === 0 ? 'text-indigo-400' : 'text-gray-300'}`}>
+                      <span className={`text-sm font-bold ${i === 0 ? 'text-indigo-400' : 'text-text-secondary'}`}>
                         v{v.version}
                       </span>
                       {i === 0 && (
@@ -63,10 +63,10 @@ export function VersionHistory({ templateId, onClose }: Props) {
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-gray-400 mt-0.5 truncate">
+                    <p className="text-sm text-text-tertiary mt-0.5 truncate">
                       {v.comment ?? `Version ${v.version}`}
                     </p>
-                    <p className="text-xs text-gray-600 mt-1">
+                    <p className="text-xs text-text-tertiary mt-1">
                       {v.savedAt.toLocaleString()} · {v.savedBy}
                     </p>
                   </div>
@@ -74,7 +74,7 @@ export function VersionHistory({ templateId, onClose }: Props) {
                     <button
                       onClick={() => handleRestore(v)}
                       disabled={restoring === v.id}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-gray-700 text-gray-300 hover:border-indigo-500 hover:text-indigo-400 transition-colors disabled:opacity-50"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg border border-border-secondary text-text-secondary hover:border-indigo-500 hover:text-indigo-400 transition-colors disabled:opacity-50"
                     >
                       <RotateCcw className="w-3 h-3" />
                       {restoring === v.id ? 'Restoring…' : 'Restore'}

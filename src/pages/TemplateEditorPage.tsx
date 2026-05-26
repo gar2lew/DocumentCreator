@@ -20,13 +20,13 @@ export function TemplateEditorPage() {
     }
   }, [id, templates]);
 
-  if (!template) return <div className="p-6 text-gray-400">Loading…</div>;
+  if (!template) return <div className="p-6 text-text-tertiary">Loading…</div>;
 
   return (
     <div className="flex flex-col h-full">
       {template.type === "pdf" && (
         <div className="flex items-center gap-1 px-6 pt-4 pb-0 shrink-0">
-          <div className="flex gap-1 bg-gray-800 rounded-lg p-1">
+          <div className="flex gap-1 bg-bg-tertiary rounded-lg p-1">
             <TabBtn
               active={view === "text"}
               onClick={() => setView("text")}
@@ -63,7 +63,7 @@ function TabBtn({
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${active ? "bg-indigo-600 text-white" : "text-gray-400 hover:text-white"}`}
+      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${active ? "bg-indigo-600 text-text" : "text-text-tertiary hover:text-text"}`}
     >
       {icon}
       {label}

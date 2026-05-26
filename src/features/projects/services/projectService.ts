@@ -14,6 +14,7 @@ import {
 } from '../../../shared/firebase/collections';
 import { COLLECTIONS } from '../../../shared/firebase/collections';
 import type { Project } from '../../../shared/types';
+import { useAppStore } from '../../../store';
 
 function mapProject(id: string, data: Record<string, unknown>): Project {
   return {
@@ -47,16 +48,25 @@ export async function getProject(id: string): Promise<Project | null> {
 export async function createProject(
   data: Omit<Project, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<Project> {
-  if (!data.organisationId) {
+  const currentUser = useAppStore.getState().currentUser;
+  if (!currentUser?.organisationId) {
     throw new Error('Cannot create project without an organisation.');
   }
 
+  const projectData = {
+    organisationId: currentUser.organisationId,
+    name: data.name,
+    acn: data.acn,
+    bankDetails: data.bankDetails,
+    createdBy: currentUser.uid,
+  };
+
   const ref = await addDoc(collection(db, COLLECTIONS.PROJECTS), {
-    ...data,
+    ...projectData,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
-  return { ...data, id: ref.id, createdAt: new Date(), updatedAt: new Date() };
+  return { ...projectData, id: ref.id, createdAt: new Date(), updatedAt: new Date() };
 }
 
 export async function updateProject(

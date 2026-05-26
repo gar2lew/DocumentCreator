@@ -7,6 +7,8 @@ import { exportTextToPdf, exportPdfWithFields } from '../services/pdfExporter';
 import { saveGeneratedDocument } from '../services/documentService';
 import { uploadFirebaseBlob } from '../../../shared/firebase/storage';
 
+type Watermark = 'draft' | 'confidential';
+
 export function useExport() {
   const { currentUser, selectedProject } = useAppStore();
   const [exporting, setExporting] = useState(false);
@@ -15,7 +17,8 @@ export function useExport() {
   async function exportDocument(
     template: Template,
     format: 'pdf' | 'docx',
-    manualData: Record<string, string>
+    manualData: Record<string, string>,
+    watermark?: Watermark
   ): Promise<string | null> {
     if (!currentUser) { setError('Not authenticated'); return null; }
 
@@ -30,15 +33,15 @@ export function useExport() {
 
       if (format === 'docx') {
         blob = template.type === 'docx' && template.fileUrl
-          ? await generateDocxFromTemplate(template.fileUrl, allData)
-          : await exportToDocx(template.content, allData);
+          ? await generateDocxFromTemplate(template.fileUrl, allData, watermark)
+          : await exportToDocx(template.content, allData, watermark, template.styles);
         filename = `${template.name.replace(/\s+/g, '_')}_${Date.now()}.docx`;
       } else if (template.type === 'pdf' && template.pdfStoragePath) {
-        const bytes = await exportPdfWithFields(template, allData);
+        const bytes = await exportPdfWithFields(template, allData, watermark);
         blob = new Blob([bytes.buffer as ArrayBuffer], { type: 'application/pdf' });
         filename = `${template.name.replace(/\s+/g, '_')}_${Date.now()}.pdf`;
       } else {
-        const bytes = await exportTextToPdf(template.content, allData);
+        const bytes = await exportTextToPdf(template.content, allData, watermark, template.styles);
         blob = new Blob([bytes.buffer as ArrayBuffer], { type: 'application/pdf' });
         filename = `${template.name.replace(/\s+/g, '_')}_${Date.now()}.pdf`;
       }

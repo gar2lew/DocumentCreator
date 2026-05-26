@@ -65,19 +65,19 @@ interface Props {
 export function FieldPresetsPanel({ onAdd }: Props) {
   return (
     <div className="p-4">
-      <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Field Presets</p>
-      <p className="text-xs text-gray-500 mb-3">Click a preset to add it to the page, then drag it into position.</p>
+      <p className="text-xs font-semibold text-text-tertiary uppercase tracking-wider mb-3">Field Presets</p>
+      <p className="text-xs text-text-tertiary mb-3">Click a preset to add it to the page, then drag it into position.</p>
       <div className="space-y-1.5">
         {PRESETS.map((preset) => (
           <button
             key={preset.label}
             onClick={() => onAdd(preset.defaults)}
-            className="w-full flex items-center gap-3 px-3 py-2.5 bg-gray-800 hover:bg-gray-750 border border-gray-700 hover:border-indigo-600 rounded-lg text-left transition-colors group"
+            className="w-full flex items-center gap-3 px-3 py-2.5 bg-bg-tertiary hover:bg-bg-tertiary border border-border-secondary hover:border-indigo-600 rounded-lg text-left transition-colors group"
           >
             <span className="text-base">{preset.emoji}</span>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-white group-hover:text-indigo-300 transition-colors">{preset.label}</p>
-              <p className="text-xs text-gray-500 truncate">{preset.description}</p>
+              <p className="text-xs font-medium text-text group-hover:text-indigo-300 transition-colors">{preset.label}</p>
+              <p className="text-xs text-text-tertiary truncate">{preset.description}</p>
             </div>
           </button>
         ))}

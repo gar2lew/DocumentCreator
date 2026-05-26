@@ -126,33 +126,33 @@ export function PdfEditor({ template }: Props) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-gray-950">
+    <div className="flex flex-col h-full bg-bg">
       {/* Toolbar */}
-      <div className="flex items-center gap-2 px-4 py-2.5 bg-gray-900 border-b border-gray-800 shrink-0 flex-wrap gap-y-2">
-        <button onClick={() => navigate('/templates')} className="text-gray-400 hover:text-white p-1.5 rounded-lg hover:bg-gray-800">
+      <div className="flex items-center gap-2 px-4 py-2.5 bg-bg-secondary border-b border-border shrink-0 flex-wrap gap-y-2">
+        <button onClick={() => navigate('/templates')} className="text-text-tertiary hover:text-text p-1.5 rounded-lg hover:bg-bg-tertiary">
           <ArrowLeft className="w-4 h-4" />
         </button>
-        <span className="font-semibold text-white truncate max-w-[200px]">{template.name}</span>
-        <span className="text-xs text-gray-600">PDF Fields</span>
+        <span className="font-semibold text-text truncate max-w-[200px]">{template.name}</span>
+        <span className="text-xs text-text-tertiary">PDF Fields</span>
         <div className="flex-1" />
 
-        <button onClick={() => fileInputRef.current?.click()} disabled={uploading} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white rounded-lg text-xs transition-colors">
+        <button onClick={() => fileInputRef.current?.click()} disabled={uploading} className="flex items-center gap-1.5 px-3 py-1.5 bg-bg-tertiary hover:bg-bg-tertiary border border-border-secondary text-text rounded-lg text-xs transition-colors">
           <Upload className="w-3.5 h-3.5" /> {uploading ? 'Uploading…' : 'Load PDF'}
         </button>
         <input ref={fileInputRef} type="file" accept=".pdf" onChange={handleFileUpload} className="hidden" />
 
-        <button onClick={() => setSnapEnabled((s) => !s)} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors border ${snapEnabled ? 'border-indigo-500 bg-indigo-900/30 text-indigo-300' : 'border-gray-700 text-gray-400 hover:border-gray-600'}`}>
+        <button onClick={() => setSnapEnabled((s) => !s)} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors border ${snapEnabled ? 'border-indigo-500 bg-indigo-900/30 text-indigo-300' : 'border-border-secondary text-text-tertiary hover:border-border-secondary'}`}>
           <Magnet className="w-3.5 h-3.5" /> Snap
         </button>
-        <button onClick={() => setShowGuides((g) => !g)} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors border ${showGuides ? 'border-indigo-500 bg-indigo-900/30 text-indigo-300' : 'border-gray-700 text-gray-400 hover:border-gray-600'}`}>
+        <button onClick={() => setShowGuides((g) => !g)} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs transition-colors border ${showGuides ? 'border-indigo-500 bg-indigo-900/30 text-indigo-300' : 'border-border-secondary text-text-tertiary hover:border-border-secondary'}`}>
           <Grid className="w-3.5 h-3.5" /> Guides
         </button>
 
         {totalPages > 1 && (
-          <div className="flex items-center gap-1 text-xs text-gray-400 bg-gray-800 rounded-lg px-2">
-            <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} className="py-1 px-1 hover:text-white">‹</button>
+          <div className="flex items-center gap-1 text-xs text-text-tertiary bg-bg-tertiary rounded-lg px-2">
+            <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} className="py-1 px-1 hover:text-text">‹</button>
             <span>{currentPage}/{totalPages}</span>
-            <button onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} className="py-1 px-1 hover:text-white">›</button>
+            <button onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} className="py-1 px-1 hover:text-text">›</button>
           </div>
         )}
 
@@ -163,13 +163,13 @@ export function PdfEditor({ template }: Props) {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Canvas area */}
-        <div className="flex-1 overflow-auto bg-gray-800 flex items-start justify-center p-8">
+        <div className="flex-1 overflow-auto bg-bg-tertiary flex items-start justify-center p-8">
           {!pdfDoc ? (
-            <div className="flex flex-col items-center justify-center h-full text-gray-500 gap-4 w-full">
-              <div className="p-8 border-2 border-dashed border-gray-700 rounded-2xl text-center max-w-sm">
+            <div className="flex flex-col items-center justify-center h-full text-text-tertiary gap-4 w-full">
+              <div className="p-8 border-2 border-dashed border-border-secondary rounded-2xl text-center max-w-sm">
                 <Upload className="w-10 h-10 mx-auto mb-3 opacity-40" />
-                <p className="text-sm font-medium text-gray-400">Load a PDF to start placing fields</p>
-                <p className="text-xs mt-1 text-gray-600">Click the PDF to add a field, or use the Presets panel →</p>
+                <p className="text-sm font-medium text-text-tertiary">Load a PDF to start placing fields</p>
+                <p className="text-xs mt-1 text-text-tertiary">Click the PDF to add a field, or use the Presets panel →</p>
                 <button onClick={() => fileInputRef.current?.click()} className="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-sm">
                   Upload PDF
                 </button>
@@ -200,8 +200,8 @@ export function PdfEditor({ template }: Props) {
         </div>
 
         {/* Right panel with tab switcher */}
-        <div className="w-64 bg-gray-900 border-l border-gray-800 flex flex-col shrink-0">
-          <div className="flex border-b border-gray-800 shrink-0">
+        <div className="w-64 bg-bg-secondary border-l border-border flex flex-col shrink-0">
+          <div className="flex border-b border-border shrink-0">
             <PanelTab active={sidePanel === 'presets'} onClick={() => setSidePanel('presets')} icon={<Layers className="w-3.5 h-3.5" />} label="Presets" />
             <PanelTab active={sidePanel === 'properties'} onClick={() => setSidePanel('properties')} icon={<Settings2 className="w-3.5 h-3.5" />} label="Properties" />
           </div>
@@ -215,15 +215,15 @@ export function PdfEditor({ template }: Props) {
                 onRemove={() => removeField(selectedField.id)}
               />
             ) : (
-              <div className="p-4 text-xs text-gray-500">
-                <p className="font-medium text-gray-400 mb-2">{pageFields.length} field(s) on page {currentPage}</p>
+              <div className="p-4 text-xs text-text-tertiary">
+                <p className="font-medium text-text-tertiary mb-2">{pageFields.length} field(s) on page {currentPage}</p>
                 <p>Click a field on the PDF to edit its properties.</p>
                 {pageFields.length > 0 && (
                   <div className="mt-3 space-y-1">
                     {pageFields.map((f) => (
-                      <button key={f.id} onClick={() => setSelectedId(f.id)} className="w-full text-left px-2 py-1.5 rounded hover:bg-gray-800 text-gray-300 truncate text-xs">
+                      <button key={f.id} onClick={() => setSelectedId(f.id)} className="w-full text-left px-2 py-1.5 rounded hover:bg-bg-tertiary text-text-secondary truncate text-xs">
                         {f.name}
-                        {f.placeholder && <span className="ml-1 text-gray-600 font-mono">{f.placeholder}</span>}
+                        {f.placeholder && <span className="ml-1 text-text-tertiary font-mono">{f.placeholder}</span>}
                       </button>
                     ))}
                   </div>
@@ -239,7 +239,7 @@ export function PdfEditor({ template }: Props) {
 
 function PanelTab({ active, onClick, icon, label }: { active: boolean; onClick: () => void; icon: React.ReactNode; label: string }) {
   return (
-    <button onClick={onClick} className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-colors ${active ? 'text-indigo-400 border-b-2 border-indigo-500' : 'text-gray-500 hover:text-gray-300'}`}>
+    <button onClick={onClick} className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-colors ${active ? 'text-indigo-400 border-b-2 border-indigo-500' : 'text-text-tertiary hover:text-text-secondary'}`}>
       {icon}{label}
     </button>
   );

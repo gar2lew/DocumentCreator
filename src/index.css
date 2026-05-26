@@ -2,6 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --bg: 255 255 255;
+  --bg-secondary: 249 250 251;
+  --bg-tertiary: 243 244 246;
+  --bg-input: 255 255 255;
+  --border: 229 231 235;
+  --border-secondary: 209 213 219;
+  --text: 17 24 39;
+  --text-secondary: 107 114 128;
+  --text-tertiary: 156 163 175;
+  --text-inverse: 255 255 255;
+}
+
+[data-theme="dark"] {
+  --bg: 10 12 16;
+  --bg-secondary: 17 19 24;
+  --bg-tertiary: 30 33 38;
+  --bg-input: 30 33 38;
+  --border: 31 41 55;
+  --border-secondary: 55 65 81;
+  --text: 255 255 255;
+  --text-secondary: 209 213 219;
+  --text-tertiary: 107 114 128;
+  --text-inverse: 10 12 16;
+}
+
 @layer base {
   * {
     box-sizing: border-box;
@@ -12,7 +38,7 @@
     padding: 0;
   }
   body {
-    @apply bg-gray-950 text-white;
+    @apply bg-bg text-text;
     font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
   }
@@ -24,9 +50,9 @@
     @apply bg-transparent;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-gray-700 rounded-full;
+    @apply bg-border-secondary rounded-full;
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-600;
+    @apply bg-text-tertiary;
   }
 }

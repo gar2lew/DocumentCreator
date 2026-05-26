@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../../../shared/firebase/config';
 import { useAppStore } from '../../../store';
-import { ensureOrgClaim, fetchUserProfile } from '../services/authService';
+import { fetchUserProfile } from '../services/authService';
 
 export function useAuthListener() {
   const { setCurrentUser, setAuthLoading } = useAppStore();
@@ -14,13 +14,6 @@ export function useAuthListener() {
       setAuthLoading(true);
       try {
         if (firebaseUser) {
-          if (active) setCurrentUser(null);
-          try {
-            // TODO: re-enable once Cloud Function is deployed.
-            await ensureOrgClaim(firebaseUser);
-          } catch (err) {
-            console.warn('Skipping org claim (function unavailable)', err);
-          }
           const profile = await fetchUserProfile(firebaseUser);
           if (active) setCurrentUser(profile?.organisationId ? profile : null);
         } else if (active) {

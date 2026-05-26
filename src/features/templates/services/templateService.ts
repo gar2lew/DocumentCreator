@@ -13,7 +13,9 @@ import {
   db,
 } from '../../../shared/firebase/collections';
 import { COLLECTIONS } from '../../../shared/firebase/collections';
-import type { Template, TemplateVersion, PdfFieldDefinition } from '../../../shared/types';
+import type { Template, TemplateVersion, PdfFieldDefinition, TemplateStyles } from '../../../shared/types';
+import { parseToNodes, serializeNodes } from '../../documentEngine/schema/serialization';
+import { CURRENT_SCHEMA_VERSION } from '../../documentEngine/schema/templateDocument';
 
 function mapTemplate(id: string, data: Record<string, unknown>): Template {
   return {
@@ -28,12 +30,36 @@ function mapTemplate(id: string, data: Record<string, unknown>): Template {
     placeholders: (data.placeholders as string[]) ?? [],
     pdfStoragePath: data.pdfStoragePath as string | undefined,
     fields: (data.fields as PdfFieldDefinition[]) ?? [],
+    styles: data.styles as TemplateStyles | undefined,
+    nodes: data.nodes as string | undefined,
+    schemaVersion: data.schemaVersion as number | undefined,
     locked: (data.locked as boolean) ?? false,
+    sectionIds: (data.sectionIds as string[]) ?? undefined,
+    dealId: data.dealId as string | undefined,
+    transactionType: data.transactionType as Template['transactionType'],
+    lifecycleState: data.lifecycleState as Template['lifecycleState'],
+    canonicalityState: data.canonicalityState as Template['canonicalityState'],
+    lastSyncAt: data.lastSyncAt as string | undefined,
+    createdFrom: data.createdFrom as string | undefined,
     currentVersion: (data.currentVersion as number) ?? 1,
     createdBy: data.createdBy as string,
     createdAt: (data.createdAt as { toDate?: () => Date })?.toDate?.() ?? new Date(),
     updatedAt: (data.updatedAt as { toDate?: () => Date })?.toDate?.() ?? new Date(),
   };
+}
+
+/**
+ * Generates a serialized node tree from content for active persistence.
+ * Content remains canonical; nodes are actively maintained infrastructure.
+ */
+function generateNodesJson(content: string): { nodesJson: string; schemaVersion: number } {
+  try {
+    const root = parseToNodes(content);
+    const nodesJson = serializeNodes(root);
+    return { nodesJson, schemaVersion: CURRENT_SCHEMA_VERSION };
+  } catch {
+    return { nodesJson: '', schemaVersion: CURRENT_SCHEMA_VERSION };
+  }
 }
 
 function mapVersion(id: string, data: Record<string, unknown>): TemplateVersion {
@@ -69,29 +95,36 @@ export async function getTemplate(id: string): Promise<Template | null> {
 }
 
 export async function createTemplate(
-  data: Omit<Template, 'id' | 'createdAt' | 'updatedAt' | 'currentVersion' | 'locked'>
+  data: Omit<Template, 'id' | 'createdAt' | 'updatedAt' | 'currentVersion' | 'locked'> & { sectionIds?: string[] }
 ): Promise<Template> {
+  const { nodesJson, schemaVersion } = generateNodesJson(data.content);
+  const now = new Date().toISOString();
   const ref = await addDoc(collection(db, COLLECTIONS.TEMPLATES), {
     ...data,
     locked: false,
     currentVersion: 1,
+    nodes: nodesJson || undefined,
+    schemaVersion,
+    canonicalityState: nodesJson ? 'hybrid' : 'legacy',
+    lastSyncAt: nodesJson ? now : undefined,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
 
   // Save initial version
-  await addDoc(collection(db, COLLECTIONS.TEMPLATE_VERSIONS), {
+  const versionDoc: Record<string, unknown> = {
     organisationId: data.organisationId,
     templateId: ref.id,
     version: 1,
     content: data.content,
-    fileUrl: data.fileUrl,
     placeholders: data.placeholders ?? [],
     fields: data.fields,
     savedBy: data.createdBy,
     savedAt: serverTimestamp(),
     comment: 'Initial version',
-  });
+  };
+  if (data.fileUrl) versionDoc.fileUrl = data.fileUrl;
+  await addDoc(collection(db, COLLECTIONS.TEMPLATE_VERSIONS), versionDoc);
 
   return {
     ...data,
@@ -105,7 +138,7 @@ export async function createTemplate(
 
 export async function saveTemplate(
   id: string,
-  data: Pick<Template, 'content' | 'fields' | 'name' | 'description' | 'templateKind'>,
+  data: Pick<Template, 'content' | 'fields' | 'name' | 'description' | 'templateKind' | 'styles'> & { lifecycleState?: Template['lifecycleState']; sectionIds?: string[]; dealId?: string; transactionType?: Template['transactionType'] },
   savedBy: string,
   comment?: string
 ): Promise<number> {
@@ -113,28 +146,54 @@ export async function saveTemplate(
   if (!existing) throw new Error('Template not found');
   if (existing.locked) throw new Error('Template is locked');
 
-  const fileChanged = data.content !== existing.content || JSON.stringify(data.fields) !== JSON.stringify(existing.fields);
-  const newVersion = fileChanged ? existing.currentVersion + 1 : existing.currentVersion;
+  const contentChanged = data.content !== existing.content || JSON.stringify(data.fields) !== JSON.stringify(existing.fields) || JSON.stringify(data.styles) !== JSON.stringify(existing.styles);
+  const lifecycleChanged = data.lifecycleState !== undefined && data.lifecycleState !== existing.lifecycleState;
+  const fileChanged = contentChanged || lifecycleChanged;
+  const newVersion = contentChanged ? existing.currentVersion + 1 : existing.currentVersion;
 
-  await updateDoc(doc(db, COLLECTIONS.TEMPLATES, id), {
-    ...data,
+  // ── Active node persistence ──
+  // Auto-regenerate nodes from content on every save.
+  // Content remains canonical; nodes are actively maintained infrastructure.
+  const { nodesJson, schemaVersion } = generateNodesJson(data.content);
+  const now = new Date().toISOString();
+  const canonicalityState: Template['canonicalityState'] = nodesJson ? 'hybrid' : 'legacy';
+
+  const updatePayload: Record<string, unknown> = {
+    name: data.name,
+    description: data.description,
+    templateKind: data.templateKind ?? null,
+    content: data.content,
+    fields: data.fields,
     currentVersion: newVersion,
+    schemaVersion,
+    nodes: nodesJson || undefined,
+    canonicalityState,
+    lastSyncAt: now,
     updatedAt: serverTimestamp(),
-  });
+  };
+  if (data.styles) updatePayload.styles = data.styles;
+  if (data.lifecycleState !== undefined) updatePayload.lifecycleState = data.lifecycleState;
+  if (data.sectionIds !== undefined) updatePayload.sectionIds = data.sectionIds;
+  if (data.dealId !== undefined) updatePayload.dealId = data.dealId;
+  if (data.transactionType !== undefined) updatePayload.transactionType = data.transactionType;
+
+  await updateDoc(doc(db, COLLECTIONS.TEMPLATES, id), updatePayload);
 
   if (fileChanged) {
-    await addDoc(collection(db, COLLECTIONS.TEMPLATE_VERSIONS), {
+    const versionDoc: Record<string, unknown> = {
       organisationId: existing.organisationId,
       templateId: id,
       version: newVersion,
       content: data.content,
-      fileUrl: existing.fileUrl,
       placeholders: existing.placeholders ?? [],
       fields: data.fields,
       savedBy,
       savedAt: serverTimestamp(),
       comment: comment ?? `Version ${newVersion}`,
-    });
+    };
+    if (existing.fileUrl) versionDoc.fileUrl = existing.fileUrl;
+    if (data.styles) versionDoc.styles = data.styles;
+    await addDoc(collection(db, COLLECTIONS.TEMPLATE_VERSIONS), versionDoc);
   }
 
   return newVersion;
@@ -181,18 +240,19 @@ export async function restoreVersion(
     updatedAt: serverTimestamp(),
   });
 
-  await addDoc(collection(db, COLLECTIONS.TEMPLATE_VERSIONS), {
+  const versionDoc: Record<string, unknown> = {
     organisationId: existing.organisationId,
     templateId,
     version: newVersion,
     content: version.content,
-    fileUrl: version.fileUrl,
     placeholders: version.placeholders ?? [],
     fields: version.fields,
     savedBy: restoredBy,
     savedAt: serverTimestamp(),
     comment: `Restored from v${version.version}`,
-  });
+  };
+  if (version.fileUrl) versionDoc.fileUrl = version.fileUrl;
+  await addDoc(collection(db, COLLECTIONS.TEMPLATE_VERSIONS), versionDoc);
 }
 
 export async function updateTemplatePdfPath(id: string, pdfStoragePath: string): Promise<void> {

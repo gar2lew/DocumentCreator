@@ -32,7 +32,14 @@ function mapTemplate(id: string, data: Record<string, unknown>): Template {
     placeholders: (data.placeholders as string[]) ?? [],
     pdfStoragePath: data.pdfStoragePath as string | undefined,
     fields: (data.fields as Template['fields']) ?? [],
+    styles: data.styles as Template['styles'],
+    nodes: data.nodes as string | undefined,
+    schemaVersion: data.schemaVersion as number | undefined,
     locked: (data.locked as boolean) ?? false,
+    lifecycleState: data.lifecycleState as Template['lifecycleState'],
+    canonicalityState: data.canonicalityState as Template['canonicalityState'],
+    lastSyncAt: data.lastSyncAt as string | undefined,
+    createdFrom: data.createdFrom as string | undefined,
     currentVersion: (data.currentVersion as number) ?? 1,
     createdBy: data.createdBy as string,
     createdAt: (data.createdAt as { toDate?: () => Date })?.toDate?.() ?? new Date(),
@@ -103,7 +110,7 @@ export function useTemplates() {
 
   const save = useCallback(async (
     id: string,
-    data: Pick<Template, 'content' | 'fields' | 'name' | 'description' | 'templateKind'>,
+    data: Pick<Template, 'content' | 'fields' | 'name' | 'description' | 'templateKind' | 'styles'> & { lifecycleState?: Template['lifecycleState']; sectionIds?: string[]; dealId?: string; transactionType?: Template['transactionType'] },
     comment?: string
   ) => {
     if (!currentUser) throw new Error('Not authenticated');
@@ -143,6 +150,7 @@ export function useTemplates() {
       fileUrl: template.fileUrl,
       placeholders: template.placeholders,
       pdfStoragePath: template.pdfStoragePath,
+      createdFrom: template.id,
     });
   }, [currentUser]);
 

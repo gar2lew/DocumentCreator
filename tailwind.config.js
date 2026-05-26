@@ -7,11 +7,21 @@ export default {
   theme: {
     extend: {
       colors: {
-        gray: {
-          750: '#2a2d35',
-          850: '#1a1d24',
-          925: '#111318',
-          950: '#0a0c10',
+        bg: {
+          DEFAULT: 'rgb(var(--bg) / <alpha-value>)',
+          secondary: 'rgb(var(--bg-secondary) / <alpha-value>)',
+          tertiary: 'rgb(var(--bg-tertiary) / <alpha-value>)',
+          input: 'rgb(var(--bg-input) / <alpha-value>)',
+        },
+        border: {
+          DEFAULT: 'rgb(var(--border) / <alpha-value>)',
+          secondary: 'rgb(var(--border-secondary) / <alpha-value>)',
+        },
+        text: {
+          DEFAULT: 'rgb(var(--text) / <alpha-value>)',
+          secondary: 'rgb(var(--text-secondary) / <alpha-value>)',
+          tertiary: 'rgb(var(--text-tertiary) / <alpha-value>)',
+          inverse: 'rgb(var(--text-inverse) / <alpha-value>)',
         },
       },
     },

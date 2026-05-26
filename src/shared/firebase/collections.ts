@@ -25,6 +25,14 @@ export const COLLECTIONS = {
   TEMPLATES: 'templates',
   TEMPLATE_VERSIONS: 'template_versions',
   DOCUMENTS_GENERATED: 'documents_generated',
+  SECTIONS: 'sections',
+  DEALS: 'deals',
+  SNAPSHOTS: 'snapshots',
+  PACKAGES: 'packages',
+  MANIFESTS: 'manifests',
+  ISSUANCES: 'issuances',
+  ISSUANCE_MANIFESTS: 'issuance_manifests',
+  RECIPIENTS: 'recipients',
 } as const;
 
 export const toDate = (ts: Timestamp | Date | undefined): Date => {

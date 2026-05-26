@@ -82,10 +82,10 @@ export function DealCreatorPage() {
     <div className="p-6 max-w-3xl">
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-white">Create Deal</h1>
-        <p className="text-gray-400 text-sm mt-1">Start with deal data, then generate from a template.</p>
+        <p className="text-text-tertiary text-sm mt-1">Start with deal data, then generate from a template.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-gray-900 border border-gray-800 rounded-xl p-5 space-y-4">
+      <form onSubmit={handleSubmit} className="bg-bg-secondary border border-border rounded-xl p-5 space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Field label="Project">
             <select
@@ -150,8 +150,8 @@ export function DealCreatorPage() {
         </div>
 
         {project && (
-          <div className="rounded-lg border border-gray-800 bg-gray-950/60 p-3 text-xs text-gray-400">
-            <p className="text-gray-300 font-medium mb-1">Project snapshot</p>
+          <div className="rounded-lg border border-border bg-bg/60 p-3 text-xs text-text-tertiary">
+            <p className="text-text-secondary font-medium mb-1">Project snapshot</p>
             <p>ACN: {project.acn || 'Not set'}</p>
             <p>Bank: {project.bankDetails.bankName || 'Not set'}</p>
             <p>Account: {project.bankDetails.accountName || 'Not set'}</p>
@@ -189,12 +189,12 @@ export function DealCreatorPage() {
   );
 }
 
-const inputClass = 'w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500';
+const inputClass = 'w-full bg-bg-input border border-border-secondary rounded-lg px-3 py-2 text-text text-sm focus:outline-none focus:border-indigo-500';
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="block text-sm text-gray-400 mb-1">{label}</span>
+      <span className="block text-sm text-text-tertiary mb-1">{label}</span>
       {children}
     </label>
   );

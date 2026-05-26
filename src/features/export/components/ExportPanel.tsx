@@ -111,6 +111,7 @@ export function ExportPanel({ template, manualData, initialDealId = '', onClose 
     key: string;
     doc: DocumentGenerated | null;
   } | null>(null);
+  const [watermark, setWatermark] = useState<'none' | 'draft' | 'confidential'>('none');
   const projectOptions = useMemo(() => {
     const byId = new Map(projects.map((project) => [project.id, project]));
     if (selectedProject) byId.set(selectedProject.id, selectedProject);
@@ -217,7 +218,7 @@ export function ExportPanel({ template, manualData, initialDealId = '', onClose 
 
     if (!validation.valid) return;
     setExportGuardError(null);
-    const url = await exportDocument(template, format, allData);
+    const url = await exportDocument(template, format, allData, watermark === 'none' ? undefined : watermark);
     if (url) { setLastUrl(url); setDone(true); }
   }
 
@@ -226,13 +227,13 @@ export function ExportPanel({ template, manualData, initialDealId = '', onClose 
 
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-md shadow-2xl">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-800">
+      <div className="bg-bg-secondary border border-border rounded-2xl w-full max-w-md shadow-2xl">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <div className="flex items-center gap-2">
             <Download className="w-5 h-5 text-green-400" />
-            <h2 className="text-lg font-semibold text-white">Export Document</h2>
+            <h2 className="text-lg font-semibold text-text">Export Document</h2>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-white"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="text-text-tertiary hover:text-text"><X className="w-5 h-5" /></button>
         </div>
 
         <div className="p-6 space-y-4">
@@ -240,7 +241,7 @@ export function ExportPanel({ template, manualData, initialDealId = '', onClose 
             <div className="text-center py-4">
               <CheckCircle className="w-12 h-12 text-green-400 mx-auto mb-3" />
               <p className="text-white font-medium">Export complete</p>
-              <p className="text-sm text-gray-400 mt-1">Your file download has started and is saved to document history.</p>
+              <p className="text-sm text-text-tertiary mt-1">Your file download has started and is saved to document history.</p>
               <a href={lastUrl} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block text-indigo-400 text-sm hover:underline">
                 Open in new tab
               </a>
@@ -249,19 +250,19 @@ export function ExportPanel({ template, manualData, initialDealId = '', onClose 
             <>
               {/* Project indicator */}
               {selectedProject ? (
-                <p className="text-sm text-gray-400">
-                  Exporting <strong className="text-white">{template.name}</strong> with project data from{' '}
+                <p className="text-sm text-text-tertiary">
+                  Exporting <strong className="text-text">{template.name}</strong> with project data from{' '}
                   <strong className="text-indigo-300">{selectedProject.name}</strong>
                 </p>
               ) : (
-                <p className="text-sm text-gray-400">
-                  Exporting <strong className="text-white">{template.name}</strong> — no project selected
+                <p className="text-sm text-text-tertiary">
+                  Exporting <strong className="text-text">{template.name}</strong> — no project selected
                 </p>
               )}
 
               {selectedDeal ? (
-                <div className="rounded-xl border border-gray-800 bg-gray-950/60 p-3">
-                  <p className="text-xs font-semibold text-gray-300">Using Deal</p>
+                <div className="rounded-xl border border-border bg-bg/60 p-3">
+                  <p className="text-xs font-semibold text-text-secondary">Using Deal</p>
                   <p className="text-sm text-white mt-1">
                     {selectedDeal.lender.name || 'Unnamed lender'} - {selectedDeal.financials.total}
                   </p>
@@ -310,7 +311,7 @@ export function ExportPanel({ template, manualData, initialDealId = '', onClose 
                         ? <AlertCircle className="w-3.5 h-3.5 text-red-400 mt-0.5 shrink-0" />
                         : <AlertTriangle className="w-3.5 h-3.5 text-amber-400 mt-0.5 shrink-0" />
                       }
-                      <span className="text-xs text-gray-300">{issue.message}</span>
+                      <span className="text-xs text-text-secondary">{issue.message}</span>
                     </div>
                   ))}
                 </div>
@@ -324,19 +325,19 @@ export function ExportPanel({ template, manualData, initialDealId = '', onClose 
               )}
 
               {/* Export diff preview */}
-              <div className="rounded-xl border border-gray-800 bg-gray-950/60 p-3">
-                <p className="text-xs font-semibold text-gray-300">Changes since last export</p>
+              <div className="rounded-xl border border-border bg-bg/60 p-3">
+                <p className="text-xs font-semibold text-text-secondary">Changes since last export</p>
                 {loadingDiff ? (
-                  <p className="text-xs text-gray-500 mt-2">Checking document history...</p>
+                  <p className="text-xs text-text-tertiary mt-2">Checking document history...</p>
                 ) : !lastExport ? (
-                  <p className="text-xs text-gray-500 mt-2">No previous export found for this template and project.</p>
+                  <p className="text-xs text-text-tertiary mt-2">No previous export found for this template and project.</p>
                 ) : diff.length === 0 && placeholderDiff.length === 0 ? (
                   <p className="text-xs text-green-400 mt-2">No placeholder changes detected.</p>
                 ) : (
                   <div className="mt-2 max-h-36 overflow-y-auto space-y-2">
                     {placeholderDiff.map((item) => (
                       <div key={`${item.status}:${item.key}`} className="text-xs">
-                        <p className="font-mono text-gray-300">&lt;&lt;{item.key}&gt;&gt;</p>
+                        <p className="font-mono text-text-secondary">&lt;&lt;{item.key}&gt;&gt;</p>
                         <p className={item.status === 'added' ? 'text-green-300' : 'text-amber-300'}>
                           Placeholder {item.status}
                         </p>
@@ -344,13 +345,33 @@ export function ExportPanel({ template, manualData, initialDealId = '', onClose 
                     ))}
                     {diff.map((item) => (
                       <div key={item.key} className="text-xs">
-                        <p className="font-mono text-gray-300">&lt;&lt;{item.key}&gt;&gt;</p>
-                        <p className="text-gray-500 line-through truncate">{item.before || '(empty)'}</p>
+                        <p className="font-mono text-text-secondary">&lt;&lt;{item.key}&gt;&gt;</p>
+                        <p className="text-text-tertiary line-through truncate">{item.before || '(empty)'}</p>
                         <p className="text-green-300 truncate">{item.after || '(empty)'}</p>
                       </div>
                     ))}
                   </div>
                 )}
+              </div>
+
+              {/* Watermark options */}
+              <div className="rounded-xl border border-border bg-bg/60 p-3">
+                <p className="text-xs font-semibold text-text-secondary mb-2">Watermark / Stamp</p>
+                <div className="flex gap-2">
+                  {(['none', 'draft', 'confidential'] as const).map((option) => (
+                    <button
+                      key={option}
+                      onClick={() => setWatermark(option)}
+                      className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-medium transition-colors border ${
+                        watermark === option
+                          ? 'bg-indigo-600 text-white border-indigo-600'
+                          : 'bg-bg-input text-text-tertiary border-border-secondary hover:text-text'
+                      }`}
+                    >
+                      {option === 'none' ? 'None' : option === 'draft' ? 'DRAFT' : 'CONFIDENTIAL'}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Format buttons */}
@@ -435,13 +456,13 @@ function DealSetup({
   const total = numberValue(principal) + numberValue(interest);
 
   return (
-    <div className="rounded-xl border border-gray-800 bg-gray-950/60 p-3 space-y-3">
-      <p className="text-xs font-semibold text-gray-300">Deal data</p>
+    <div className="rounded-xl border border-border bg-bg/60 p-3 space-y-3">
+      <p className="text-xs font-semibold text-text-secondary">Deal data</p>
       <div className="grid grid-cols-2 gap-2">
         <select
           value={selectedProjectId}
           onChange={(event) => onProjectChange(event.target.value)}
-          className="col-span-2 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm"
+          className="col-span-2 bg-bg-input border border-border-secondary rounded-lg px-3 py-2 text-text text-sm"
         >
           <option value="">Select project</option>
           {projects.map((project) => (
@@ -451,7 +472,7 @@ function DealSetup({
         <select
           value={selectedDealId}
           onChange={(event) => onDealChange(event.target.value)}
-          className="col-span-2 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm"
+          className="col-span-2 bg-bg-input border border-border-secondary rounded-lg px-3 py-2 text-text text-sm"
         >
           <option value="">{loadingDeals ? 'Loading deals...' : 'No deal selected'}</option>
           {deals.map((deal) => (
@@ -463,7 +484,7 @@ function DealSetup({
         <select
           value={dealType}
           onChange={(event) => onDealTypeChange(event.target.value as DealType)}
-          className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm"
+          className="bg-bg-input border border-border-secondary rounded-lg px-3 py-2 text-text text-sm"
         >
           <option value="deed_settlement">Deed settlement</option>
           <option value="loan_agreement">Loan agreement</option>
@@ -472,40 +493,40 @@ function DealSetup({
           value={clientName}
           onChange={(event) => onClientNameChange(event.target.value)}
           placeholder="Client Name"
-          className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500"
+          className="bg-bg-input border border-border-secondary rounded-lg px-3 py-2 text-text text-sm placeholder-text-tertiary"
         />
         <input
           value={principal}
           onChange={(event) => onPrincipalChange(sanitizeNumericInput(event.target.value))}
           placeholder="Principal"
           inputMode="decimal"
-          className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500"
+          className="bg-bg-input border border-border-secondary rounded-lg px-3 py-2 text-text text-sm placeholder-text-tertiary"
         />
         <input
           value={interest}
           onChange={(event) => onInterestChange(sanitizeNumericInput(event.target.value))}
           placeholder="Interest"
           inputMode="decimal"
-          className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm placeholder-gray-500"
+          className="bg-bg-input border border-border-secondary rounded-lg px-3 py-2 text-text text-sm placeholder-text-tertiary"
         />
         <input
           value={formatNumber(total)}
           readOnly
           aria-label="Total"
-          className="col-span-2 bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-gray-300 text-sm"
+          className="col-span-2 bg-bg-secondary border border-border-secondary rounded-lg px-3 py-2 text-text-secondary text-sm"
         />
         <input
           value={settlementDate}
           onChange={(event) => onSettlementDateChange(event.target.value)}
           type="date"
-          className="col-span-2 bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-sm"
+          className="col-span-2 bg-bg-input border border-border-secondary rounded-lg px-3 py-2 text-text text-sm"
         />
       </div>
       <button
         type="button"
         onClick={onCreateDeal}
         disabled={creatingDeal || !selectedProjectId || !clientName.trim()}
-        className="w-full py-2 rounded-lg bg-gray-800 hover:bg-gray-750 disabled:opacity-50 text-white text-sm border border-gray-700"
+        className="w-full py-2 rounded-lg bg-bg-tertiary hover:bg-bg-tertiary disabled:opacity-50 text-text text-sm border border-border-secondary"
       >
         {creatingDeal ? 'Creating deal...' : 'Create deal from project'}
       </button>
@@ -525,17 +546,17 @@ function FormatButton({ icon, label, description, onClick, loading }: {
     <button
       onClick={onClick}
       disabled={loading}
-      className="w-full flex items-center gap-4 p-4 bg-gray-800 hover:bg-gray-850 border border-gray-700 hover:border-gray-600 rounded-xl text-left transition-colors disabled:opacity-50"
+      className="w-full flex items-center gap-4 p-4 bg-bg-tertiary hover:bg-bg-tertiary border border-border-secondary hover:border-border-secondary rounded-xl text-left transition-colors disabled:opacity-50"
     >
-      <div className="p-2 bg-gray-900 rounded-lg">{icon}</div>
+      <div className="p-2 bg-bg-secondary rounded-lg">{icon}</div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-white">{label}</p>
-        <p className="text-xs text-gray-500 mt-0.5">{description}</p>
+        <p className="text-sm font-medium text-text">{label}</p>
+        <p className="text-xs text-text-tertiary mt-0.5">{description}</p>
       </div>
       {loading ? (
         <div className="w-4 h-4 border-2 border-gray-500 border-t-white rounded-full animate-spin" />
       ) : (
-        <Download className="w-4 h-4 text-gray-500 shrink-0" />
+        <Download className="w-4 h-4 text-text-tertiary shrink-0" />
       )}
     </button>
   );

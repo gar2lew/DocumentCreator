@@ -6,123 +6,69 @@ service cloud.firestore {
       return request.auth != null;
     }
 
+    function userDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
     function userOrgId() {
-      return request.auth.token.organisationId != null
-        ? request.auth.token.organisationId
-        : request.auth.token.orgId;
-    }
-
-    function profilePath() {
-      return /databases/$(database)/documents/users/$(request.auth.uid);
-    }
-
-    function hasProfile() {
-      return isAuthenticated() && exists(profilePath());
-    }
-
-    function profileOrgId() {
-      return hasProfile() ? get(profilePath()).data.organisationId : null;
-    }
-
-    function profileRole() {
-      return hasProfile() ? get(profilePath()).data.role : null;
+      return userDoc().organisationId;
     }
 
     function userRole() {
-      return request.auth.token.role != null
-        ? request.auth.token.role
-        : profileRole();
-    }
-
-    function isSameOrg(orgId) {
-      return isAuthenticated() && (
-        userOrgId() == orgId ||
-        profileOrgId() == orgId
-      );
-    }
-
-    function isAdmin() {
-      return isAuthenticated() && userRole() == 'admin';
+      return userDoc().role;
     }
 
     function isEditorOrAbove() {
-      return isAuthenticated() && userRole() in ['admin', 'editor'];
+      return userRole() in ['admin', 'editor'];
     }
 
-    function createIsSameOrg() {
-      return isSameOrg(request.resource.data.organisationId);
-    }
-
-    function updateKeepsSameOrg() {
-      return isSameOrg(resource.data.organisationId)
-        && request.resource.data.organisationId == resource.data.organisationId;
+    function isAdmin() {
+      return userRole() == 'admin';
     }
 
     match /users/{userId} {
-      allow read: if isAuthenticated() && (
-        request.auth.uid == userId ||
-        isSameOrg(resource.data.organisationId)
-      );
-      allow create: if isAuthenticated()
-        && request.auth.uid == userId
-        && (
-          userOrgId() == request.resource.data.organisationId ||
-          !exists(/databases/$(database)/documents/users/$(userId))
-        );
-      allow update: if isAuthenticated()
-        && request.auth.uid == userId
-        && request.resource.data.organisationId == resource.data.organisationId;
+      allow read: if isAuthenticated() && request.auth.uid == userId;
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isAuthenticated() && request.auth.uid == userId;
       allow delete: if false;
     }
 
     match /organisations/{orgId} {
-      allow read: if isSameOrg(orgId);
-      allow create: if isAuthenticated();
-      allow update: if isSameOrg(orgId) && isAdmin();
-      allow delete: if false;
+      allow read, write: if isAuthenticated();
     }
 
     match /projects/{projectId} {
-      allow read: if isSameOrg(resource.data.organisationId);
-      allow create: if createIsSameOrg() && isEditorOrAbove();
-      allow update: if updateKeepsSameOrg() && isEditorOrAbove();
-      allow delete: if isSameOrg(resource.data.organisationId) && isAdmin();
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && userOrgId() == request.resource.data.organisationId && isEditorOrAbove();
+      allow update: if isAuthenticated() && userOrgId() == resource.data.organisationId && request.resource.data.organisationId == resource.data.organisationId && isEditorOrAbove();
+      allow delete: if isAuthenticated() && userOrgId() == resource.data.organisationId && isAdmin();
     }
 
     match /deals/{dealId} {
-      allow read: if isSameOrg(resource.data.organisationId);
-      allow create: if createIsSameOrg() && isEditorOrAbove();
-      allow update: if updateKeepsSameOrg() && isEditorOrAbove();
-      allow delete: if isSameOrg(resource.data.organisationId) && isAdmin();
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && userOrgId() == request.resource.data.organisationId && isEditorOrAbove();
+      allow update: if isAuthenticated() && userOrgId() == resource.data.organisationId && request.resource.data.organisationId == resource.data.organisationId && isEditorOrAbove();
+      allow delete: if isAuthenticated() && userOrgId() == resource.data.organisationId && isAdmin();
     }
 
     match /templates/{templateId} {
-      allow read: if isSameOrg(resource.data.organisationId);
-      allow create: if createIsSameOrg() && isEditorOrAbove();
-      allow update: if updateKeepsSameOrg() && (
-        (
-          isEditorOrAbove()
-          && resource.data.locked != true
-        ) ||
-        (
-          isAdmin()
-          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['locked', 'updatedAt'])
-        )
-      );
-      allow delete: if isSameOrg(resource.data.organisationId) && isAdmin();
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && userOrgId() == request.resource.data.organisationId && isEditorOrAbove();
+      allow update: if isAuthenticated() && userOrgId() == resource.data.organisationId && request.resource.data.organisationId == resource.data.organisationId && (isEditorOrAbove() && resource.data.locked != true || isAdmin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['locked', 'updatedAt']));
+      allow delete: if isAuthenticated() && userOrgId() == resource.data.organisationId && isAdmin();
     }
 
     match /template_versions/{versionId} {
-      allow read: if isSameOrg(resource.data.organisationId);
-      allow create: if createIsSameOrg() && isEditorOrAbove();
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && userOrgId() == request.resource.data.organisationId && isEditorOrAbove();
       allow update: if false;
       allow delete: if false;
     }
 
     match /documents_generated/{docId} {
-      allow read: if isSameOrg(resource.data.organisationId);
-      allow create: if createIsSameOrg();
-      allow update: if false;
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && userOrgId() == request.resource.data.organisationId;
+      allow update: if isAuthenticated() && userOrgId() == resource.data.organisationId && request.resource.data.organisationId == resource.data.organisationId;
       allow delete: if false;
     }
   }

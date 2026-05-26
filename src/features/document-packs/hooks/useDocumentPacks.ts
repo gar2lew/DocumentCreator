@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { onSnapshot } from 'firebase/firestore';
+import { useAppStore } from '../../../store';
 import {
   collection,
   db,
@@ -22,12 +23,13 @@ function mapDocumentPack(id: string, data: Record<string, unknown>): PersistedDo
 }
 
 export function useDocumentPacks(dealId: string) {
+  const organisationId = useAppStore((state) => state.currentUser?.organisationId ?? '');
   const [packs, setPacks] = useState<PersistedDocumentPack[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    if (!dealId) {
+    if (!dealId || !organisationId) {
       setPacks([]);
       setLoading(false);
       return;
@@ -38,6 +40,7 @@ export function useDocumentPacks(dealId: string) {
 
     const q = query(
       collection(db, COLLECTIONS.DOCUMENTS_GENERATED),
+      where('organisationId', '==', organisationId),
       where('dealId', '==', dealId),
       orderBy('createdAt', 'desc')
     );
@@ -53,7 +56,7 @@ export function useDocumentPacks(dealId: string) {
         setLoading(false);
       }
     );
-  }, [dealId]);
+  }, [dealId, organisationId]);
 
   return { packs, loading, error };
 }
