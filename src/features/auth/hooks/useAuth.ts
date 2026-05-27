@@ -2,7 +2,18 @@ import { useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../../../shared/firebase/config';
 import { useAppStore } from '../../../store';
+import type { User } from '../../../shared/types';
 import { ensureOrgClaim, fetchUserProfile } from '../services/authService';
+
+// TEMP: auth gate bypassed for local/demo usage
+const DEMO_USER: User = {
+  uid: 'demo-user',
+  email: 'demo@example.com',
+  displayName: 'Demo User',
+  organisationId: 'demo-org',
+  role: 'admin',
+  createdAt: new Date(),
+};
 
 export function useAuthListener() {
   const { setCurrentUser, setAuthLoading } = useAppStore();
@@ -24,7 +35,8 @@ export function useAuthListener() {
           const profile = await fetchUserProfile(firebaseUser);
           if (active) setCurrentUser(profile?.organisationId ? profile : null);
         } else if (active) {
-          setCurrentUser(null);
+          // TEMP: auth gate bypassed for local/demo usage
+          setCurrentUser(DEMO_USER);
         }
       } catch (error) {
         console.error('Auth initialisation failed', error);
